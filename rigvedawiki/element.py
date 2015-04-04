@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-
 class Element(object):
 
-    def __init__(self, parent, tag, attrib=None, close=True):
+    def __init__(self, parent, tag=None, attrib=None, close=True):
         self.parent = parent
         self.tag = tag
         self.children = []
@@ -18,14 +16,16 @@ class Element(object):
     def get_parent(self):
         return self.parent
 
-    def to_xml(self):
-        ret = '<%s' % self.tag
-        for k, v in self.attrib.items():
-            ret += ' %s="%s"' % (k, v)
-        ret += '>'
+    def to_html(self):
+        ret = ''
+        if self.tag:
+            ret += '<%s' % self.tag
+            for k, v in self.attrib.items():
+                ret += ' %s="%s"' % (k, v)
+            ret += '>'
         for child in self.children:
-            ret += child.to_xml()
-        if self.close:
+            ret += child.to_html()
+        if self.tag and self.close:
             ret += '</%s>' % self.tag
         return ret
 
@@ -38,5 +38,5 @@ class TextElement(Element):
     def append_child(self, e):
         assert False
 
-    def to_xml(self):
+    def to_html(self):
         return self.text

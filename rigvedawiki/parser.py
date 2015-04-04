@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-
 import os
 import re
 from element import Element, TextElement
 
-class Converter(object):
+class Parser(object):
 
     def __init__(self):
         pass
@@ -61,14 +59,14 @@ class Converter(object):
             match = self.line_re.match(line)
             self._apply(parent, match, 'line')
 
-    block_quote = r'(?P<quote>(?P<quote_text>(^\>[^\n]*\n|(?<=\n)\>[^\n]*\n)+))'
+    block_quote = r'(?P<quote>(?P<quote_text>(^\>\s[^\n]*\n|(?<=\n)\>\s[^\n]*\n)+))'
     # block_indent = r'(?P<indent>((^\s[^\n]*\n)|((?<=\n)\s[^\n]*\n))+)'
     block = (
         block_quote,
         # block_indent,
     )
     block_re = re.compile('|'.join(block), re.X)
-    block_quote_re = re.compile(r'^\>', re.M)
+    block_quote_re = re.compile(r'^\>\s', re.M)
 
     def block_quote_repl(self, parent, quote_text):
         self.parse_block(Element(parent, 'blockquote'), re.sub(self.block_quote_re, '', quote_text))
@@ -94,7 +92,7 @@ Element(head, 'meta', {'charset':'utf-8'}, close=False)
 Element(head, 'link', {'href':'../web/style.css', 'rel':'stylesheet'}, close=False)
 body = Element(html, 'body')
 
-converter = Converter()
+converter = Parser()
 raw_file = open('test/data/LightNovel.txt', 'r')
 converter.parse_block(body, raw_file.read())
 raw_file.close()
@@ -102,5 +100,5 @@ raw_file.close()
 if not os.path.exists('out'):
     os.makedirs('out')
 html_file = open('out/LightNovel.html', 'w')
-html_file.write('<!DOCTYPE html>' + html.to_xml())
+html_file.write('<!DOCTYPE html>' + html.to_html())
 html_file.close()
